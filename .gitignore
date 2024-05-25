@@ -1,3 +1,4 @@
-/data/*
-/db/*
-/test/*
+data/*
+db/*
+test/*
+node_modules/*
