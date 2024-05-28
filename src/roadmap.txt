@@ -1,0 +1,18 @@
+DONE
+get data from website
+telegram bot connection
+decode emergency code
+sqlite db controller
+parse emergency data to find vehicles
+emergency generator for test purposes
+
+TODO
+new emergency event
+emergency code change event
+emergency change vehicle event
+emergency end event
+installer script
+
+
+
+
