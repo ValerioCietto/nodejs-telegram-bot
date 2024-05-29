@@ -64,7 +64,7 @@ function sendData() {
   const emergencies = generateEmergencies();
   console.log(emergencies);
   axios
-    .post("http://localhost:13001/data", {
+    .post("http://localhost:13000/data", {
       dati: JSON.stringify(emergencies),
     })
     .then((response) => {

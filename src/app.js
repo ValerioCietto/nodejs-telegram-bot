@@ -1,6 +1,7 @@
 // launch with node src/app.js
 
-const { Telegraf } = require("telegraf");
+const { TelegramBot } = require("./telegram-bot.js");
+const { Server } = require("./server.js");
 const { decodeCode } = require("./decodeUrgency");
 const { vehicles } = require("./vehicles");
 const DatabaseController = require("./sqlite.controller.js");
@@ -23,8 +24,6 @@ vehicleSubscriptions.push({
 });
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
-// echo user text messages
-bot.on("message", (ctx) => textManager(ctx));
 
 console.log("config bot");
 bot.launch();
@@ -60,84 +59,6 @@ function sendMessageToSubscribers(text, vehicleCode) {
     // bot.telegram.sendMessage(subscriber.chatId, text);
   });
 }
-
-function sendMessageToTelegram(chatId, text) {
-  bot.telegram.sendMessage(chatId, text);
-}
-
-function textManager(ctx) {
-  console.log(ctx.message.text);
-  if (ctx.message.text === "/start") {
-    ctx.reply(
-      "Benvenuto in ER dump bot. Scrivi la password per connetterti al servizio"
-    );
-  } else if (ctx.message.text === "/stop") {
-    ctx.reply(
-      "Con questo comando non riceverai più notifiche dal bot. Cancella e crea di nuovo la chat per ricominciare."
-    );
-    // remove the subscriber with the chat id
-    subscribers = subscribers.filter((subscriber) => {
-      return subscriber.chatId !== ctx.chat.id;
-    });
-  } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
-    ctx.reply(
-      "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
-    );
-    // print chat id
-    console.log(ctx.chat.id);
-    console.log(ctx.message.from.username);
-
-    // add subscriber
-    subscribers.push({
-      chatId: ctx.chat.id,
-      username: ctx.message.from.username,
-    });
-  } else if (vehicles.includes(ctx.message.text)) {
-    ctx.reply("Sottoscrizione mezzi ancora non implementata");
-    console.log(ctx.chat.id);
-    console.log(ctx.message.from.username);
-    vehicleSubscriptions.push({
-      chatId: ctx.chat.id,
-      username: ctx.message.from.username,
-      vehicleCode: ctx.message.text,
-    });
-  } else {
-    ctx.reply("Comando non riconosciuto");
-  }
-}
-
-const express = require("express");
-const cors = require("cors");
-
-const app = express();
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb" }));
-
-// add cors middleware
-app.use(cors());
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.get("/hello", (req, res) => {
-  const sentData = req.query;
-  console.log(req.query);
-  res.send("Hello World!");
-});
-
-app.post("/data", (req, res) => {
-  console.log(req.body.dati);
-  // parse json that was stringified
-  const data = JSON.parse(req.body.dati);
-
-  handleEmergencyData(data);
-  res.send("ok");
-});
-
-app.listen(13001, () => {
-  console.log("Bot app listening on port 13000!");
-});
 
 function handleEmergencyData(json) {
   // json is an array of Emergency objects
