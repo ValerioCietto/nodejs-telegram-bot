@@ -23,7 +23,7 @@ vehicleSubscriptions.push({
   vehicleCode: "MONTERENZIO41",
 });
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 
 console.log("config bot");
 bot.launch();
