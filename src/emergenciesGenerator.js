@@ -15,7 +15,7 @@ function generateRandomVehicle() {
 }
 
 function generateRandomCodex() {
-  const codexList = ["KC19G", "KC19H", "KC19I", "KC19J"];
+  const codexList = ["KC19G", "KC19R", "KC02V", "KC19G"];
   return codexList[Math.floor(Math.random() * codexList.length)];
 }
 

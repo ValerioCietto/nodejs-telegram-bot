@@ -1,11 +1,13 @@
 // launch with node src/app.js
 
-const { TelegramBot } = require("./telegram-bot.js");
-const { Server } = require("./server.js");
+const { Telegraf } = require("telegraf");
 const { decodeCode } = require("./decodeUrgency");
 const { vehicles } = require("./vehicles");
 const DatabaseController = require("./sqlite.controller.js");
 const dbController = new DatabaseController();
+dbController.createTables();
+const express = require("express");
+const cors = require("cors");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./src/credenziali.env" });
@@ -13,20 +15,12 @@ dotenv.config({ path: "./src/credenziali.env" });
 let previousEmergencies = [];
 let emergencies = [];
 const subscribers = [];
-const vehicleSubscriptions = [];
 
-// mock subscription
-subscribers.push({ chatId: 24326382, username: "ValerioCietto" });
-vehicleSubscriptions.push({
-  chatId: 24326382,
-  username: "ValerioCietto",
-  vehicleCode: "MONTERENZIO41",
-});
-
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
 console.log("config bot");
 bot.launch();
+bot.on("message", (ctx) => textManager(ctx));
 // Enable graceful stop
 process.once("SIGINT", () => onStop("SIGINT"));
 process.once("SIGTERM", () => onStop("SIGTERM"));
@@ -36,28 +30,73 @@ function onStop(signal) {
   bot.stop(signal);
 }
 
-function sendMessageToSubscribers(text, vehicleCode) {
-  console.log("sendMessageToSubscribers:" + vehicleCode);
-  subscribers.forEach((subscriber) => {
-    // if subscriber has a vehicle subscription, send only to that vehicle
-    console.log(
-      "searching subscriptions for subscriber: " +
-        subscriber.username +
-        " - " +
-        subscriber.chatId
+const app = express();
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb" }));
+app.use(cors());
+app.get("/", (req, res) => {
+  res.send("indirizzi disponibili /test e /data per l'invio di dati");
+});
+app.get("/test", (req, res) => {
+  res.send(
+    "Il servizio è attivo. Start time: " +
+      this.dateTimeStart +
+      ". Last data: " +
+      this.dateTimeLastData
+  );
+});
+let dateTimeStart = new Date();
+let dateTimeLastData = new Date();
+
+app.post("/data", (req, res) => {
+  console.log(req.body.dati);
+  // parse json that was stringified
+  const data = JSON.parse(req.body.dati);
+  dateTimeLastData = new Date();
+  handleEmergencyData(data);
+  res.send("ok");
+});
+app.listen(13000, () => {
+  console.log("Server started on port 13000");
+});
+dateTimeStart = new Date();
+
+function textManager(ctx) {
+  console.log(ctx.message.text);
+  if (ctx.message.text === "/start") {
+    ctx.reply(
+      "Benvenuto in ER dump bot. Scrivi la password per connetterti al servizio"
     );
-    vehicleSubscriptions.forEach((vehicleSubscription) => {
-      if (
-        vehicleSubscription.chatId === subscriber.chatId &&
-        vehicleSubscription.vehicleCode === vehicleCode
-      ) {
-        console.log("found vehicle subscription: " + vehicleCode);
-        bot.telegram.sendMessage(subscriber.chatId, text);
-        return;
-      }
+  } else if (ctx.message.text === "/stop") {
+    ctx.reply(
+      "Con questo comando non riceverai più notifiche dal bot. Cancella e crea di nuovo la chat per ricominciare."
+    );
+    // remove the subscriber with the chat id
+    subscribers = subscribers.filter((subscriber) => {
+      return subscriber.chatId !== ctx.chat.id;
     });
-    // bot.telegram.sendMessage(subscriber.chatId, text);
-  });
+  } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
+    ctx.reply(
+      "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
+    );
+    dbController.addUser(ctx.message.from.username, ctx.chat.id);
+  } else if (vehicles.includes(ctx.message.text)) {
+    ctx.reply("mezzo sottoscritto: " + ctx.message.text);
+    console.log(ctx.chat.id);
+    console.log(ctx.message.from.username);
+    dbController.addSubscription(
+      ctx.chat.id,
+      ctx.message.from.username,
+      ctx.message.text
+    );
+  } else {
+    ctx.reply("Comando non riconosciuto");
+  }
+}
+
+function sendMessageNewEmergency(emergency, chatId) {
+  const formattedText = messageNewEmergency(emergency);
+  bot.telegram.sendMessage(chatId, formattedText);
 }
 
 function handleEmergencyData(json) {
@@ -98,9 +137,34 @@ function handleEmergencyData(json) {
 
 function onNewEmergencies(emergencies) {
   emergencies.forEach((emergency) => {
-    console.log("new emergency: " + emergency.emergencyId);
+    if (emergency.manageVehicleForSynoptics) {
+      emergency.manageVehicleForSynoptics.forEach((vehicle) => {
+        console.log(
+          "[onNewEmergencies][" +
+            emergency.emergencyId +
+            "] vehicle: " +
+            vehicle.vehicleCode
+        );
+        dbController.getSubscribers(vehicle.vehicleCode).then((subscribers) => {
+          console.log(
+            "[onNewEmergencies][" +
+              emergency.emergencyId +
+              "] subscribers: " +
+              subscribers.length
+          );
+          subscribers.forEach((subscriber) => {
+            console.log(
+              "[onNewEmergencies][" +
+                emergency.emergencyId +
+                "] subscriber: " +
+                subscriber.username
+            );
+            sendMessageNewEmergency(emergency, subscriber.chatId);
+          });
+        });
+      });
+    }
   });
-  console.log("new emergencies");
 }
 
 function messageNewEmergency(emergency) {
@@ -110,10 +174,17 @@ function messageNewEmergency(emergency) {
   // SC01V località OZZANO DELL'EMILIA CAPOLUOGO - OZZANO DELL'EMILIA PARCO DELLA RESISTENZA PARCO DELLA RESISTENZA
   // Il mezzo assegnato all'intervento è la macchina MONTERENZIO41 in STRADA con patologia TRAuMATICA codice VERDE
   // link a openstreetmap
+  const vehiclesCodes = [];
+  emergency.manageVehicleForSynoptics.forEach((vehicle) => {
+    vehiclesCodes.push(vehicle.vehicleCode);
+  });
+  const vehiclesFromEmergency = vehiclesCodes.join(", ");
+  const decodedCodex = decodeCode(emergency.codex);
+
   emergencyString =
     `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} alle ${emergency.timeDelayed} IN CORSO ` +
-    `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${emergency.manageVehicleForSynoptics?.vehicleCode} ` +
-    `in STRADA con patologia ${emergency.patology} codice ${emergency.codex} \n link a openstreetmap `;
+    `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${vehiclesFromEmergency} ` +
+    `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency} \n link a openstreetmap `;
   console.log("new emergency");
   return emergencyString;
 }

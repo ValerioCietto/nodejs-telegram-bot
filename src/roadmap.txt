@@ -5,8 +5,10 @@ decode emergency code
 sqlite db controller
 parse emergency data to find vehicles
 emergency generator for test purposes
+message on new emergency
 
 TODO
+link openstreetmap
 new emergency event
 emergency code change event
 emergency change vehicle event
