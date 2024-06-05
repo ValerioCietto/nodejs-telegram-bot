@@ -3,6 +3,13 @@
 const { Telegraf } = require("telegraf");
 const { decodeCode } = require("./decodeUrgency");
 const { vehicles } = require("./vehicles");
+const {
+  messageNewEmergency,
+  messageEndEmergency,
+  messageChangeCode,
+  messageChangeNumberOfVehicles,
+  messageEmergencyInStandBy,
+} = require("./messageFormat.js");
 const DatabaseController = require("./sqlite.controller.js");
 const dbController = new DatabaseController();
 dbController.createTables();
@@ -99,6 +106,12 @@ function sendMessageNewEmergency(emergency, chatId) {
   bot.telegram.sendMessage(chatId, formattedText);
 }
 
+// this function generates the event for:
+// - new emergency
+// - ended emergency
+// - change code
+// - change number of vehicles
+// - emergency in standby
 function handleEmergencyData(json) {
   // json is an array of Emergency objects
   json.forEach((emergency) => {
@@ -165,46 +178,4 @@ function onNewEmergencies(emergencies) {
       });
     }
   });
-}
-
-function messageNewEmergency(emergency) {
-  let emergencyString = "";
-  // example
-  // 🚑ALERT! EMERGENZA N° 021815 alle 12:29 IN CORSO
-  // SC01V località OZZANO DELL'EMILIA CAPOLUOGO - OZZANO DELL'EMILIA PARCO DELLA RESISTENZA PARCO DELLA RESISTENZA
-  // Il mezzo assegnato all'intervento è la macchina MONTERENZIO41 in STRADA con patologia TRAuMATICA codice VERDE
-  // link a openstreetmap
-  const vehiclesCodes = [];
-  emergency.manageVehicleForSynoptics.forEach((vehicle) => {
-    vehiclesCodes.push(vehicle.vehicleCode);
-  });
-  const vehiclesFromEmergency = vehiclesCodes.join(", ");
-  const decodedCodex = decodeCode(emergency.codex);
-
-  emergencyString =
-    `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} alle ${emergency.timeDelayed} IN CORSO ` +
-    `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${vehiclesFromEmergency} ` +
-    `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency} \n link a openstreetmap `;
-  console.log("new emergency");
-  return emergencyString;
-}
-
-function messageEndEmergency() {
-  // example
-  // EMERGENZA N° 021717 -> KC03R - Mezzo MONTERENZIO41 si è liberato alle 11:30, codice VERDE, luogo OZZANO DELL'EMILIA
-  console.log("end emergency");
-}
-
-function messageChangeCode() {
-  // example
-  // 🚑ALERT! EMERGENZA N° 021815 ha cambiato codice colore gravità da VERDE a GIALLO alle ore 12:38
-  console.log("change code");
-}
-
-function messageChangeNumberOfVehicles() {
-  console.log("change number of vehicles");
-}
-
-function messageEmergencyInStandBy() {
-  console.log("emergency in standby");
 }

@@ -8,13 +8,18 @@ emergency generator for test purposes
 message on new emergency
 
 TODO
-link openstreetmap
+link openstreetmap -> da analizzare pagina
+
 new emergency event
+
 emergency code change event
 emergency change vehicle event
 emergency end event
 installer script
 
+https://www.openstreetmap.org/#map=16/44.5368/11.5327
 
+https://www.openstreetmap.org/#map=16/32.23339088586016/21.164510289911966
 
-
+da definire "codice" che cos'è
+https://dumper.118er.it/mappa/'+codice+'/'+lng+'/'+lat+'
