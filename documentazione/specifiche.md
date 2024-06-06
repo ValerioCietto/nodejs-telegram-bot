@@ -16,7 +16,7 @@ EMERGENZA N° 021717 -> KC03R - Mezzo MONTERENZIO41 si è liberato alle 11:30
 Attenzione!
 🚑ALERT! EMERGENZA N° 021815 alle 12:29 IN CORSO
 SC01V località OZZANO DELL'EMILIA CAPOLUOGO - OZZANO DELL'EMILIA PARCO DELLA RESISTENZA PARCO DELLA RESISTENZA
-Il mezzo assegnato all'intervento è la macchina MONTERENZIO41 in STRADA con patologia TRAuMATICA codice VERDE
+Il mezzo assegnato all'intervento è la macchina MONTERENZIO41 in STRADA con patologia TRAUMATICA codice VERDE
 link a openstreetmap
 
 Attenzione!
@@ -35,3 +35,29 @@ NOTIFICA CAMBIO CODICE alle volte in itinere l'emergenza cambia codice (in gener
 NOTIFICA CAMBIO NUMERO MEZZI Se si aggiunge un mezzo che prima non era assegnato dovrebbe essere notificato
 
 EMERGENZA IN SOSTA Se c'è per più di 5 minuti una emergenza in sosta (quindi ancora senza una ambulanza assegnata) ed è nel comune Monterenzio, dovrebbe mandare un messaggio (Desiderata, permette all'equipaggio di prepararsi ma non è indispensabile)
+
+---
+
+ciclo di vita di una emergenza
+
+c'è un emergencyId? è una emergenza
+
+id 1, no emergency with id 1
+-> messageNewEmergency
+
+id 1, emergency with id 1 exists, old emergency has vehicles null, new has at least one vehicle
+-> messageNewEmergency
+
+id 1, emergency with id 1 exists, old emergency has vehicles != new emergency.vehicles
+-> messageChangeNumberOfVehicles
+
+id 1, codex SC01V, comune MONTERENZIO, mezzi null, time now - time start > 5 min
+-> messageEmergencyInStandBy
+
+id 1, codex SC01G, old codex SC01V,
+-> messageChangeCode
+
+se emergenze > 1
+ricontrolla tutte le emergenze
+se emergenza non c'è in nuove emergenze, chiama evento
+-> messageEndEmergency
