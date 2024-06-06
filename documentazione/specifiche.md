@@ -61,3 +61,6 @@ se emergenze > 1
 ricontrolla tutte le emergenze
 se emergenza non c'è in nuove emergenze, chiama evento
 -> messageEndEmergency
+
+parametri di emergenza
+id, vehicles, codex, timeStart, locality, json
