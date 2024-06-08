@@ -35,6 +35,7 @@ NOTIFICA CAMBIO CODICE alle volte in itinere l'emergenza cambia codice (in gener
 NOTIFICA CAMBIO NUMERO MEZZI Se si aggiunge un mezzo che prima non era assegnato dovrebbe essere notificato
 
 EMERGENZA IN SOSTA Se c'è per più di 5 minuti una emergenza in sosta (quindi ancora senza una ambulanza assegnata) ed è nel comune Monterenzio, dovrebbe mandare un messaggio (Desiderata, permette all'equipaggio di prepararsi ma non è indispensabile)
+La notifica di emergenza in sosta viene inviata solo in base a sede e comune della emergenza 
 
 ---
 
