@@ -30,16 +30,23 @@ function generateRandomVehicleAssegnation() {
   return vehicleAssignments.length > 0 ? vehicleAssignments : null;
 }
 
+function makeRandomTime() {
+  const hours = Math.floor(Math.random() * 24);
+  const minutes = Math.floor(Math.random() * 60);
+  const seconds = Math.floor(Math.random() * 60);
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 // Function to generate a random emergency
 function generateRandomEmergency() {
   return {
     address: "VIA RONCAGLIO, 21 Piano: R",
     emergencyId: Math.floor(Math.random() * 5),
-    timeDelayed: Math.floor(Math.random() * 24),
-    localityMunicipality: "BOLOC",
+    timeDelayed: makeRandomTime(),
     codex: generateRandomCodex(),
     district: "ZONA BLU 4 - BO LOC 2023 07",
     criticity: "G",
+    localityMunicipality: "SAN LAZZARO DI MODENA - MODENA",
     eventCoord: {
       class: "it.eng.area118.dumpdp.model.LatLonDM",
       latD: 44,

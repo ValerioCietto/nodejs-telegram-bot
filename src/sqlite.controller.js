@@ -26,15 +26,15 @@ class DatabaseController {
       "CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, username TEXT, chatId TEXT)";
     const createSubscriptions =
       "CREATE TABLE IF NOT EXISTS subscription (id INTEGER PRIMARY KEY, chatId TEXT, username TEXT, vehicleCode TEXT)";
-  
+
     const createEmergencies =
-      "CREATE TABLE IF NOT EXISTS emergency ("+
-      "id INTEGER PRIMARY KEY, "+
-      "emergencyId INTEGER, "+
-      "vehicles TEXT, "+
-      "codex TEXT, "+
-      "timeStart DATETIME, "+
-      "localityMunicipality TEXT, "+
+      "CREATE TABLE IF NOT EXISTS emergency (" +
+      "id INTEGER PRIMARY KEY, " +
+      "emergencyId INTEGER, " +
+      "vehicles TEXT, " +
+      "codex TEXT, " +
+      "timeStart DATETIME, " +
+      "localityMunicipality TEXT, " +
       "jsonEmergency TEXT)";
 
     this.db.run(createUsers, (err) => {

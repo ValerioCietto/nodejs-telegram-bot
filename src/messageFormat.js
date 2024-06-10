@@ -36,12 +36,14 @@ function messageEndEmergency(emergency) {
     emergencyString =
       `EMERGENZA N° ${emergency.emergencyId} → ${emergency.codex}` +
       `Mezzi ${vehiclesFromEmergency} si sono liberati alle ${emergency.timeDelayed}, ` +
-      `codice ${decodedCodex.urgency}, ``luogo ${emergency.localityMunicipality}`;
+      `codice ${decodedCodex.urgency}, ` +
+      `luogo ${emergency.localityMunicipality}`;
   } else {
     emergencyString =
       `EMERGENZA N° ${emergency.emergencyId} → ${emergency.codex}` +
       ` Mezzo ${vehiclesFromEmergency} si è liberato alle ${emergency.timeDelayed}, ` +
-      `codice ${decodedCodex.urgency}, ``luogo ${emergency.localityMunicipality}`;
+      `codice ${decodedCodex.urgency},  ` +
+      `luogo ${emergency.localityMunicipality}`;
   }
   return emergencyString;
 }
@@ -63,15 +65,15 @@ function messageChangeNumberOfVehicles(oldEmergency, newEmergency) {
 
   const previousVehicles = [];
   oldEmergency.manageVehicleForSynoptics.forEach((vehicle) => {
-    vehiclesCodes.push(vehicle.vehicleCode);
+    previousVehicles.push(vehicle.vehicleCode);
   });
-  const previousVehiclesFromEmergency = vehiclesCodes.join(", ");
+  const previousVehiclesFromEmergency = previousVehicles.join(", ");
 
   const newVehicles = [];
   newEmergency.manageVehicleForSynoptics.forEach((vehicle) => {
-    vehiclesCodes.push(vehicle.vehicleCode);
+    newVehicles.push(vehicle.vehicleCode);
   });
-  const newVehiclesFromEmergency = vehiclesCodes.join(", ");
+  const newVehiclesFromEmergency = newVehicles.join(", ");
 
   emergencyString = `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} ha cambiato numero di veicoli, da ${previousVehiclesFromEmergency} a ${newVehiclesFromEmergency}`;
 
@@ -79,7 +81,11 @@ function messageChangeNumberOfVehicles(oldEmergency, newEmergency) {
 }
 
 function messageEmergencyInStandBy() {
-  console.log("emergency in standby");
+  // 🚑ALERT! EMERGENZA N° 021815 in standby nel comune di SAN VITALE - BOLOGNA
+  // iniziata alle 21:49:26
+  let emergencyString = "";
+  emergencyString = `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} in standby nel comune di ${emergency.localityMunicipality} iniziata alle ${emergency.timeDelayed}`;
+  return emergencyString;
 }
 
 module.exports = {

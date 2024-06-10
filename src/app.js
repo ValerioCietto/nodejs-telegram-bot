@@ -115,7 +115,7 @@ function sendMessageNewEmergency(emergency, chatId) {
 function handleEmergencyData(json) {
   // json is an array of Emergency objects
   json.forEach((emergency) => {
-    if (emergency?.address !== undefined) {
+    if (emergency?.emergencyId !== undefined) {
       emergencies.push(emergency);
     }
   });
