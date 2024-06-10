@@ -1,0 +1,16 @@
+{
+  "sede": [
+    {
+      "codice": "001",
+      "nome": "PA Monterenzio",
+      "comuni": ["Monterenzio"],
+      "veicoli": ["MONTERENZIO41", "MONTERENZIO42"]
+    },
+    {
+      "codice": "002",
+      "nome": "PA OzzanoSLazzaro",
+      "comuni": ["Ozzano dell'Emilia", "San Lazzaro di Savena"],
+      "veicoli": ["OZZANO46", "SANLAZZARO54"]
+    }
+  ]
+}
