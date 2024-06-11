@@ -8,6 +8,10 @@ emergency generator for test purposes
 message on new emergency
 
 TODO
+generatore emergenze con db
+gestione sede
+gestione max users
+
 link openstreetmap -> da analizzare pagina
 
 new emergency event
