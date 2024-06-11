@@ -2,7 +2,7 @@
 
 const { Telegraf } = require("telegraf");
 const { decodeCode } = require("./decodeUrgency");
-const { vehicles } = require("./vehicles");
+const { vehicles } = require("../configurazione/Veicoli");
 const {
   messageNewEmergency,
   messageEndEmergency,
@@ -17,7 +17,7 @@ const express = require("express");
 const cors = require("cors");
 
 const dotenv = require("dotenv");
-dotenv.config({ path: "./src/credenziali.env" });
+dotenv.config({ path: "./configurazione/credenziali.env" });
 
 let previousEmergencies = [];
 let emergencies = [];
