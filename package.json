@@ -12,11 +12,9 @@
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "dom-parser": "^1.1.5",
-    "domparser": "^0.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "sqlite3": "^5.1.7",
-    "telegraf": "^4.16.3",
-    "xmldom": "^0.6.0"
+    "telegraf": "^4.16.3"
   }
 }
