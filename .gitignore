@@ -2,3 +2,4 @@ data/*
 db/*
 test/*
 node_modules/*
+configurazione/credenziali.env
