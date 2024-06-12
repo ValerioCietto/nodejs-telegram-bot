@@ -79,9 +79,7 @@ function textManager(ctx) {
       "Con questo comando non riceverai più notifiche dal bot. Cancella e crea di nuovo la chat per ricominciare."
     );
     // remove the subscriber with the chat id
-    subscribers = subscribers.filter((subscriber) => {
-      return subscriber.chatId !== ctx.chat.id;
-    });
+    dbController.removeUser(ctx.chat.id);
   } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
     ctx.reply(
       "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
@@ -124,6 +122,14 @@ function handleEmergencyData(json) {
   emergencies.forEach((emergency) => {
     if (!previousEmergencies.includes(emergency.emergencyId)) {
       newEmergencies.push(emergency);
+      dbController.addEmergency(
+        emergency.emergencyId,
+        emergency.vehicles,
+        emergency.codex,
+        emergency.timeStart,
+        emergency.localityMunicipality,
+        JSON.stringify(emergency)
+      );
     }
   });
   onNewEmergencies(newEmergencies);

@@ -1,9 +1,9 @@
-// launch with node src/emergenciesGenerator.js
+// launch with node src/emergenciesGeneratorDatabase.js
 // this script reads all emergencies in database, changes one so that it can trigger
 // an event and sends data using axios
 
 const axios = require("axios");
-const vehicles = require("./vehicles");
+const vehicles = require("../configurazione/Veicoli");
 const dbController = require("./sqlite.controller");
 
 const vehicleList = vehicles.vehicles;

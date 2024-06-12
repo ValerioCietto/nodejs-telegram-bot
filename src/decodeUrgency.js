@@ -51,6 +51,13 @@ function encodeCode(place, pathology, urgency) {
   return `${placeCode}${pathologyCode}${urgencyCode}`;
 }
 
+/**
+ * Decodes a given code into its corresponding place, pathology, and urgency.
+ *
+ * @param {string} code - The code to be decoded.
+ * @return {Object|string} An object containing the place, pathology, and urgency if the code is valid.
+ *                          Otherwise, a string indicating that an invalid code was provided.
+ */
 function decodeCode(code) {
   const placeCode = code[0];
   const urgencyCode = code[code.length - 1];

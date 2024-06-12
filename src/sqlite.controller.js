@@ -62,10 +62,24 @@ class DatabaseController {
     });
   }
 
-  async addEmergency(emergencyId, jsonEmergency) {
+  async addEmergency(
+    emergencyId,
+    vehicles,
+    codex,
+    timeStart,
+    localityMunicipality,
+    jsonEmergency
+  ) {
     this.db.run(
-      "INSERT INTO emergency (emergencyId, jsonEmergency) VALUES (?, ?)",
-      [emergencyId, jsonEmergency],
+      "INSERT INTO emergency (emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) VALUES (?, ?, ? ,? , ?, ?)",
+      [
+        emergencyId,
+        vehicles,
+        codex,
+        timeStart,
+        localityMunicipality,
+        jsonEmergency,
+      ],
       (err) => {
         if (err) {
           console.error("Error adding emergency:", err.message);
@@ -127,6 +141,7 @@ class DatabaseController {
   }
 
   async addSubscription(chatId, username, vehicleCode) {
+    console.log("Adding subscription:", chatId, username, vehicleCode);
     this.db.run(
       "INSERT INTO subscription (chatId, username, vehicleCode) VALUES (?, ?, ?)",
       [chatId, username, vehicleCode],

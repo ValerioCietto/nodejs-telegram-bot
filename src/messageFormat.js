@@ -1,4 +1,5 @@
 // format messages to send to Telegram Bot
+const { decodeCode } = require("./decodeUrgency");
 
 function messageNewEmergency(emergency) {
   let emergencyString = "";
