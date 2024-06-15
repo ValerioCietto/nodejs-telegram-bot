@@ -99,9 +99,22 @@ function textManager(ctx) {
   }
 }
 
-function sendMessageNewEmergency(emergency, chatId) {
-  const formattedText = messageNewEmergency(emergency);
-  bot.telegram.sendMessage(chatId, formattedText);
+function parseJSONEmergencies(json) {
+  const emergencyArrayOutput = [];
+  json.forEach((emergency) => {
+    if (emergency?.emergencyId !== undefined) {
+      emergencyArrayOutput.push(emergency);
+    }
+  });
+  return emergencyArrayOutput;
+}
+
+function makeVehicleString(manageVehicleForSynoptics) {
+  const vehicleList = [];
+  manageVehicleForSynoptics.forEach((vehicle) => {
+    vehicleList.push(vehicle.vehicleCode);
+  });
+  return vehicleList.join(", ");
 }
 
 // this function generates the event for:
@@ -110,21 +123,25 @@ function sendMessageNewEmergency(emergency, chatId) {
 // - change code
 // - change number of vehicles
 // - emergency in standby
-function handleEmergencyData(json) {
-  // json is an array of Emergency objects
-  json.forEach((emergency) => {
-    if (emergency?.emergencyId !== undefined) {
-      emergencies.push(emergency);
-    }
-  });
+async function handleEmergencyData(json) {
+  const emergencyData = parseJSONEmergencies(json);
+  if (emergencyData.length === 0) {
+    // void json provided, exit
+    return;
+  }
+
   const newEmergencies = [];
+  const currentEmergencies = await dbController.getEmergencies();
   // CHECK IF NEW EMERGENCY
-  emergencies.forEach((emergency) => {
-    if (!previousEmergencies.includes(emergency.emergencyId)) {
+  emergencyData.forEach((emergency) => {
+    if (!currentEmergencies.includes(emergency.emergencyId)) {
+      console.log(
+        "[handleEmergencyData] new emergency: " + emergency.emergencyId
+      );
       newEmergencies.push(emergency);
       dbController.addEmergency(
         emergency.emergencyId,
-        emergency.vehicles,
+        makeVehicleString(emergency.manageVehicleForSynoptics),
         emergency.codex,
         emergency.timeStart,
         emergency.localityMunicipality,
@@ -134,24 +151,150 @@ function handleEmergencyData(json) {
   });
   onNewEmergencies(newEmergencies);
 
-  previousEmergencies.forEach((emergency) => {
-    if (!emergencies.includes(emergency)) {
-      // ENDED Emergency!
-      // send message to subscribers
-      console.log("ended emergency: " + emergency.emergencyId);
-      // remove from previousEmergencies
-      previousEmergencies = previousEmergencies.filter((prevEmergency) => {
-        return prevEmergency !== emergency.emergencyId;
-      });
+  // CHECK CHANGE CODEX
+  const changeCodeEmergencies = [];
+  emergencyData.forEach((emergency) => {
+    currentEmergencies.forEach((currentEmergency) => {
+      if (currentEmergency === emergency.emergencyId) {
+        if (emergency.codex !== currentEmergency.codex) {
+          console.log(
+            "[handleEmergencyData] change code emergency: " +
+              emergency.emergencyId
+          );
+          changeCodeEmergencies.push(emergency);
+          dbController.updateEmergency(
+            emergency.emergencyId,
+            emergency.vehicles,
+            emergency.codex,
+            emergency.timeStart,
+            emergency.localityMunicipality
+          );
+        }
+      }
+    });
+  });
+  onChangeCodeEmergencies(changeCodeEmergencies);
+
+  // CHECK CHANGE NUMBER OF VEHICLES
+  const changeVehiclesEmergencies = [];
+  emergencyData.forEach((emergency) => {
+    currentEmergencies.forEach((currentEmergency) => {
+      if (currentEmergency === emergency.emergencyId) {
+        if (emergency.vehicles !== currentEmergency.vehicles) {
+          console.log(
+            "[handleEmergencyData] change number of vehicles emergency: " +
+              emergency.emergencyId
+          );
+          changeVehiclesEmergencies.push(emergency);
+          dbController.updateEmergency(
+            emergency.emergencyId,
+            emergency.vehicles,
+            emergency.codex,
+            emergency.timeStart,
+            emergency.localityMunicipality
+          );
+        }
+      }
+    });
+  });
+  onChangeVehiclesEmergencies(changeVehiclesEmergencies);
+
+  // CHECK IF ENDED EMERGENCY
+  const endedEmergencies = [];
+  currentEmergencies.forEach((emergencyId) => {
+    if (!emergencyData.includes(emergencyId)) {
+      console.log("[handleEmergencyData] ended emergency: " + emergencyId);
+      endedEmergencies.push(emergencyId);
+      dbController.removeEmergency(emergencyId);
     }
   });
+  onEndedEmergencies(endedEmergencies);
+}
 
-  // add to previousEmergencies all new emergencies
-  previousEmergencies = previousEmergencies.concat(
-    newEmergencies.map((emergency) => {
-      return emergency.emergencyId;
-    })
-  );
+function sendMessageNewEmergency(emergency, chatId) {
+  const formattedText = messageNewEmergency(emergency);
+  bot.telegram.sendMessage(chatId, formattedText);
+}
+
+function sendMessageEndEmergency(emergency, chatId) {
+  const formattedText = messageEndEmergency(emergency);
+  bot.telegram.sendMessage(chatId, formattedText);
+}
+
+function sendMessageChangeCode(emergency, chatId) {
+  const formattedText = messageChangeCode(emergency);
+  bot.telegram.sendMessage(chatId, formattedText);
+}
+
+function sendMessageChangeNumberOfVehicles(emergency, chatId) {
+  const formattedText = messageChangeNumberOfVehicles(emergency);
+  bot.telegram.sendMessage(chatId, formattedText);
+}
+
+function onEndedEmergencies(emergencies) {
+  emergencies.forEach((emergencyId) => {
+    dbController.getSubscribers(emergencyId).then((subscribers) => {
+      console.log(
+        "[onEndedEmergencies][" +
+          emergencyId +
+          "] subscribers: " +
+          subscribers.length
+      );
+      subscribers.forEach((subscriber) => {
+        console.log(
+          "[onEndedEmergencies][" +
+            emergencyId +
+            "] subscriber: " +
+            subscriber.username
+        );
+        sendMessageEndedEmergency(emergencyId, subscriber.chatId);
+      });
+    });
+  });
+}
+
+function onChangeCodeEmergencies(emergencies) {
+  emergencies.forEach((emergency) => {
+    dbController.getSubscribers(emergency.emergencyId).then((subscribers) => {
+      console.log(
+        "[onChangeCodeEmergencies][" +
+          emergency.emergencyId +
+          "] subscribers: " +
+          subscribers.length
+      );
+      subscribers.forEach((subscriber) => {
+        console.log(
+          "[onChangeCodeEmergencies][" +
+            emergency.emergencyId +
+            "] subscriber: " +
+            subscriber.username
+        );
+        sendMessageChangeCode(emergency, subscriber.chatId);
+      });
+    });
+  });
+}
+
+function onChangeVehiclesEmergencies(emergencies) {
+  emergencies.forEach((emergency) => {
+    dbController.getSubscribers(emergency.emergencyId).then((subscribers) => {
+      console.log(
+        "[onChangeVehiclesEmergencies][" +
+          emergency.emergencyId +
+          "] subscribers: " +
+          subscribers.length
+      );
+      subscribers.forEach((subscriber) => {
+        console.log(
+          "[onChangeVehiclesEmergencies][" +
+            emergency.emergencyId +
+            "] subscriber: " +
+            subscriber.username
+        );
+        sendMessageChangeNumberOfVehicles(emergency, subscriber.chatId);
+      });
+    });
+  });
 }
 
 function onNewEmergencies(emergencies) {

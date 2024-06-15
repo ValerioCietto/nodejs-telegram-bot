@@ -5,12 +5,12 @@
 // After your operations
 // dbController.close();
 
-const Database = require('better-sqlite3');
-const path = require('path');
+const Database = require("better-sqlite3");
+const path = require("path");
 
 class DatabaseController {
   constructor() {
-    this.db = new Database(path.resolve(__dirname, '../db/118er.db'));
+    this.db = new Database(path.resolve(__dirname, "../db/118er.db"));
     console.log("Connected to the 118er database.");
   }
 
@@ -45,54 +45,102 @@ class DatabaseController {
     console.log("Tables created or already exist.");
   }
 
-  addEmergency(emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) {
-    const stmt = this.db.prepare('INSERT INTO emergency (emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) VALUES (?, ?, ?, ?, ?, ?)');
-    stmt.run(emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency);
+  addEmergency(
+    emergencyId,
+    vehicles,
+    codex,
+    timeStart,
+    localityMunicipality,
+    jsonEmergency
+  ) {
+    const stmt = this.db.prepare(
+      "INSERT INTO emergency (emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    stmt.run(
+      emergencyId,
+      vehicles,
+      codex,
+      timeStart,
+      localityMunicipality,
+      jsonEmergency
+    );
     console.log("Emergency added.");
   }
 
   getEmergencies() {
-    const stmt = this.db.prepare('SELECT * FROM emergency');
+    const stmt = this.db.prepare("SELECT * FROM emergency");
     return stmt.all();
   }
 
+  updateEmergency(
+    emergencyId,
+    vehicles,
+    codex,
+    timeStart,
+    localityMunicipality,
+    jsonEmergency
+  ) {
+    const stmt = this.db.prepare(
+      "UPDATE emergency SET vehicles = ?, codex = ?, timeStart = ?, localityMunicipality = ?, jsonEmergency = ? WHERE emergencyId = ?"
+    );
+    stmt.run(
+      vehicles,
+      codex,
+      timeStart,
+      localityMunicipality,
+      jsonEmergency,
+      emergencyId
+    );
+    console.log("Emergency updated.");
+  }
+
   deleteEmergency(emergencyId) {
-    const stmt = this.db.prepare('DELETE FROM emergency WHERE emergencyId = ?');
+    const stmt = this.db.prepare("DELETE FROM emergency WHERE emergencyId = ?");
     stmt.run(emergencyId);
     console.log("Emergency deleted.");
   }
 
   addUser(username, chatId) {
-    const stmt = this.db.prepare('INSERT INTO user (username, chatId) VALUES (?, ?)');
+    const stmt = this.db.prepare(
+      "INSERT INTO user (username, chatId) VALUES (?, ?)"
+    );
     stmt.run(username, chatId);
     console.log("User added.");
   }
 
   deleteUser(username) {
-    const stmt = this.db.prepare('DELETE FROM user WHERE username = ?');
+    const stmt = this.db.prepare("DELETE FROM user WHERE username = ?");
     stmt.run(username);
     console.log("User deleted.");
   }
 
   addSubscription(chatId, username, vehicleCode) {
-    const stmt = this.db.prepare('INSERT INTO subscription (chatId, username, vehicleCode) VALUES (?, ?, ?)');
+    const stmt = this.db.prepare(
+      "INSERT INTO subscription (chatId, username, vehicleCode) VALUES (?, ?, ?)"
+    );
     stmt.run(chatId, username, vehicleCode);
     console.log("Subscription added.");
   }
 
   deleteSubscription(chatId, vehicleCode) {
-    const stmt = this.db.prepare('DELETE FROM subscription WHERE chatId = ? AND vehicleCode = ?');
+    const stmt = this.db.prepare(
+      "DELETE FROM subscription WHERE chatId = ? AND vehicleCode = ?"
+    );
     stmt.run(chatId, vehicleCode);
     console.log("Subscription deleted.");
   }
 
   getSubscribers(vehicleCode) {
-    const stmt = this.db.prepare('SELECT * FROM subscription WHERE vehicleCode = ?');
+    const stmt = this.db.prepare(
+      "SELECT * FROM subscription WHERE vehicleCode = ?"
+    );
     return stmt.all(vehicleCode);
   }
 
   removeSubscriber(chatId, vehicleCode) {
-    const stmt = this.db.prepare('DELETE FROM subscription WHERE chatId = ? AND vehicleCode = ?');
+    const stmt = this.db.prepare(
+      "DELETE FROM subscription WHERE chatId = ? AND vehicleCode = ?"
+    );
     stmt.run(chatId, vehicleCode);
     console.log("Subscription removed.");
   }
