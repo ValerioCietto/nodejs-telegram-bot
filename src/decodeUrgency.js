@@ -5,6 +5,7 @@ const places = {
   K: "Casa",
   L: "Lavoro",
   Q: "Scuole",
+  T: "Non definito",
   Z: "Altri luoghi",
 };
 
@@ -26,6 +27,7 @@ const pathologies = {
   C15: "Infettiva",
   C19: "Altra Patologia",
   C20: "Patologia non identificata",
+  "IU*": "Non definito",
 };
 
 const urgencies = {

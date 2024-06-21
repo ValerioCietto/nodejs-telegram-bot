@@ -80,6 +80,7 @@ function textManager(ctx) {
     );
     // remove the subscriber with the chat id
     dbController.removeUser(ctx.chat.id);
+    dbController.removeAllSubscriptionsByChatId(ctx.chat.id);
   } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
     ctx.reply(
       "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
@@ -134,21 +135,28 @@ async function handleEmergencyData(json) {
 
   const newEmergencies = [];
   const currentEmergencies = await dbController.getEmergencies();
+
+  const currentEmergenciesIds = [];
+  currentEmergencies.forEach((current) => {
+    currentEmergenciesIds.push("" + current.emergencyId);
+  });
+  console.log(currentEmergenciesIds);
   // CHECK IF NEW EMERGENCY
   emergencyData.forEach((emergency) => {
-    if (!currentEmergencies.includes(emergency.emergencyId)) {
+    const isNewEmergency = dbController.addEmergency(
+      emergency.emergencyId,
+      makeVehicleString(emergency.manageVehicleForSynoptics),
+      emergency.codex,
+      emergency.timeDelayed,
+      emergency.localityMunicipality,
+      JSON.stringify(emergency)
+    );
+    console.log("new emergency: " + isNewEmergency);
+    if (isNewEmergency) {
       console.log(
         "[handleEmergencyData] new emergency: " + emergency.emergencyId
       );
       newEmergencies.push(emergency);
-      dbController.addEmergency(
-        emergency.emergencyId,
-        makeVehicleString(emergency.manageVehicleForSynoptics),
-        emergency.codex,
-        emergency.timeStart,
-        emergency.localityMunicipality,
-        JSON.stringify(emergency)
-      );
     }
   });
   onNewEmergencies(newEmergencies);
@@ -168,7 +176,7 @@ async function handleEmergencyData(json) {
             emergency.emergencyId,
             emergency.vehicles,
             emergency.codex,
-            emergency.timeStart,
+            emergency.timeDelayed,
             emergency.localityMunicipality
           );
         }
@@ -192,7 +200,7 @@ async function handleEmergencyData(json) {
             emergency.emergencyId,
             emergency.vehicles,
             emergency.codex,
-            emergency.timeStart,
+            emergency.timeDelayed,
             emergency.localityMunicipality
           );
         }
@@ -202,15 +210,17 @@ async function handleEmergencyData(json) {
   onChangeVehiclesEmergencies(changeVehiclesEmergencies);
 
   // CHECK IF ENDED EMERGENCY
-  const endedEmergencies = [];
-  currentEmergencies.forEach((emergency) => {
-    if (!emergencyData.includes(emergency.id)) {
-      console.log("[handleEmergencyData] ended emergency: " + emergency.id);
-      endedEmergencies.push(emergency.id);
-      dbController.deleteEmergency(emergency.id);
-    }
-  });
-  onEndedEmergencies(endedEmergencies);
+  // const endedEmergencies = [];
+  // currentEmergencies.forEach((emergency) => {
+  //  if (!emergencyData.includes(emergency.emergencyId)) {
+  //    console.log(
+  //      "[handleEmergencyData] ended emergency: " + emergency.emergencyId
+  //    );
+  //    endedEmergencies.push(emergency.emergencyId);
+  //    dbController.deleteEmergency(emergency.emergencyId);
+  //  }
+  //});
+  //onEndedEmergencies(endedEmergencies);
 }
 
 // return true if the 2 emergencies have same manageVehicleForSynoptics

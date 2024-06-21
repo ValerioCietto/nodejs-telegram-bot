@@ -53,18 +53,29 @@ class DatabaseController {
     localityMunicipality,
     jsonEmergency
   ) {
+    // make a select to see if emergency is already added
     const stmt = this.db.prepare(
-      "INSERT INTO emergency (emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) VALUES (?, ?, ?, ?, ?, ?)"
+      "SELECT * FROM emergency WHERE emergencyId = ?"
     );
-    stmt.run(
-      emergencyId,
-      vehicles,
-      codex,
-      timeStart,
-      localityMunicipality,
-      jsonEmergency
-    );
-    console.log("Emergency added.");
+    const result = stmt.get(emergencyId);
+    if (result) {
+      console.log("Emergency already exists.");
+      return false;
+    } else {
+      // if no, add emergency
+      const stmtAdd = this.db.prepare(
+        "INSERT INTO emergency (emergencyId, vehicles, codex, timeStart, localityMunicipality, jsonEmergency) VALUES (?, ?, ?, ?, ?, ?)"
+      );
+      stmtAdd.run(
+        emergencyId,
+        vehicles,
+        codex,
+        timeStart,
+        localityMunicipality,
+        jsonEmergency
+      );
+      return true;
+    }
   }
 
   getEmergencies() {
@@ -92,6 +103,21 @@ class DatabaseController {
       emergencyId
     );
     console.log("Emergency updated.");
+  }
+
+  getEmergencyById(emergencyId) {
+    const stmt = this.db.prepare(
+      "SELECT * FROM emergency WHERE emergencyId = ?"
+    );
+    return stmt.get(emergencyId);
+  }
+
+  getIfEmergencyExists(emergencyId) {
+    const stmt = this.db.prepare(
+      "SELECT * FROM emergency WHERE emergencyId = ?"
+    );
+    const result = stmt.get(emergencyId);
+    return result;
   }
 
   deleteEmergency(emergencyId) {
@@ -143,6 +169,12 @@ class DatabaseController {
     );
     stmt.run(chatId, vehicleCode);
     console.log("Subscription removed.");
+  }
+
+  removeAllSubscriptionsByChatId(chatId) {
+    const stmt = this.db.prepare("DELETE FROM subscription WHERE chatId = ?");
+    stmt.run(chatId);
+    console.log("Subscriptions for chatId " + chatId + " removed");
   }
 
   close() {
