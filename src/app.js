@@ -111,9 +111,11 @@ function parseJSONEmergencies(json) {
 
 function makeVehicleString(manageVehicleForSynoptics) {
   const vehicleList = [];
-  manageVehicleForSynoptics.forEach((vehicle) => {
-    vehicleList.push(vehicle.vehicleCode);
-  });
+  if (manageVehicleForSynoptics) {
+    manageVehicleForSynoptics.forEach((vehicle) => {
+      vehicleList.push(vehicle.vehicleCode);
+    });
+  }
   return vehicleList.join(", ");
 }
 
@@ -180,7 +182,7 @@ async function handleEmergencyData(json) {
   emergencyData.forEach((emergency) => {
     currentEmergencies.forEach((currentEmergency) => {
       if (currentEmergency === emergency.emergencyId) {
-        if (emergency.vehicles !== currentEmergency.vehicles) {
+        if (!sameLogistics(emergency1, emergency2)) {
           console.log(
             "[handleEmergencyData] change number of vehicles emergency: " +
               emergency.emergencyId
@@ -201,14 +203,33 @@ async function handleEmergencyData(json) {
 
   // CHECK IF ENDED EMERGENCY
   const endedEmergencies = [];
-  currentEmergencies.forEach((emergencyId) => {
-    if (!emergencyData.includes(emergencyId)) {
-      console.log("[handleEmergencyData] ended emergency: " + emergencyId);
-      endedEmergencies.push(emergencyId);
-      dbController.removeEmergency(emergencyId);
+  currentEmergencies.forEach((emergency) => {
+    if (!emergencyData.includes(emergency.id)) {
+      console.log("[handleEmergencyData] ended emergency: " + emergency.id);
+      endedEmergencies.push(emergency.id);
+      dbController.deleteEmergency(emergency.id);
     }
   });
   onEndedEmergencies(endedEmergencies);
+}
+
+// return true if the 2 emergencies have same manageVehicleForSynoptics
+function sameLogistics(emergency1, emergency2) {
+  if (
+    emergency1.manageVehicleForSynoptics.length !==
+    emergency2.manageVehicleForSynoptics.length
+  ) {
+    return false;
+  }
+  for (let i = 0; i < emergency1.manageVehicleForSynoptics.length; i++) {
+    if (
+      emergency1.manageVehicleForSynoptics[i] !==
+      emergency2.manageVehicleForSynoptics[i]
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function sendMessageNewEmergency(emergency, chatId) {
@@ -233,22 +254,22 @@ function sendMessageChangeNumberOfVehicles(emergency, chatId) {
 
 function onEndedEmergencies(emergencies) {
   emergencies.forEach((emergencyId) => {
-    dbController.getSubscribers(emergencyId).then((subscribers) => {
+    const subscribers = dbController.getSubscribers(emergencyId);
+
+    console.log(
+      "[onEndedEmergencies][" +
+        emergencyId +
+        "] subscribers: " +
+        subscribers.length
+    );
+    subscribers.forEach((subscriber) => {
       console.log(
         "[onEndedEmergencies][" +
           emergencyId +
-          "] subscribers: " +
-          subscribers.length
+          "] subscriber: " +
+          subscriber.username
       );
-      subscribers.forEach((subscriber) => {
-        console.log(
-          "[onEndedEmergencies][" +
-            emergencyId +
-            "] subscriber: " +
-            subscriber.username
-        );
-        sendMessageEndedEmergency(emergencyId, subscriber.chatId);
-      });
+      sendMessageEndedEmergency(emergencyId, subscriber.chatId);
     });
   });
 }
@@ -307,22 +328,21 @@ function onNewEmergencies(emergencies) {
             "] vehicle: " +
             vehicle.vehicleCode
         );
-        dbController.getSubscribers(vehicle.vehicleCode).then((subscribers) => {
+        const subscribers = dbController.getSubscribers(vehicle.vehicleCode);
+        console.log(
+          "[onNewEmergencies][" +
+            emergency.emergencyId +
+            "] subscribers: " +
+            subscribers.length
+        );
+        subscribers.forEach((subscriber) => {
           console.log(
             "[onNewEmergencies][" +
               emergency.emergencyId +
-              "] subscribers: " +
-              subscribers.length
+              "] subscriber: " +
+              subscriber.username
           );
-          subscribers.forEach((subscriber) => {
-            console.log(
-              "[onNewEmergencies][" +
-                emergency.emergencyId +
-                "] subscriber: " +
-                subscriber.username
-            );
-            sendMessageNewEmergency(emergency, subscriber.chatId);
-          });
+          sendMessageNewEmergency(emergency, subscriber.chatId);
         });
       });
     }
