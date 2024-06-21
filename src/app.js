@@ -151,7 +151,6 @@ async function handleEmergencyData(json) {
       emergency.localityMunicipality,
       JSON.stringify(emergency)
     );
-    console.log("new emergency: " + isNewEmergency);
     if (isNewEmergency) {
       console.log(
         "[handleEmergencyData] new emergency: " + emergency.emergencyId

@@ -59,7 +59,6 @@ class DatabaseController {
     );
     const result = stmt.get(emergencyId);
     if (result) {
-      console.log("Emergency already exists.");
       return false;
     } else {
       // if no, add emergency
