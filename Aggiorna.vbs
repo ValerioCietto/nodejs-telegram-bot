@@ -1,18 +1,17 @@
-
 ' Create required objects
 Set objShell = CreateObject("WScript.Shell")
 Set objFSO = CreateObject("Scripting.FileSystemObject")
-Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+Set objWinHTTP = CreateObject("WinHttp.WinHttpRequest.5.1")
 Set objStream = CreateObject("ADODB.Stream")
 
 ' Function to download a file
 Function DownloadFile(url, path)
-    objXMLHTTP.Open "GET", url, False
-    objXMLHTTP.Send
-    If objXMLHTTP.Status = 200 Then
+    objWinHTTP.Open "GET", url, False
+    objWinHTTP.Send
+    If objWinHTTP.Status = 200 Then
         objStream.Open
         objStream.Type = 1 ' adTypeBinary
-        objStream.Write objXMLHTTP.ResponseBody
+        objStream.Write objWinHTTP.ResponseBody
         objStream.Position = 0 ' Set the stream position to the start
         objStream.SaveToFile path, 2 ' adSaveCreateOverWrite
         objStream.Close
@@ -65,6 +64,6 @@ End If
 ' Clean up
 Set objShell = Nothing
 Set objFSO = Nothing
-Set objXMLHTTP = Nothing
+Set objWinHTTP = Nothing
 Set objStream = Nothing
 Set objShellApp = Nothing
