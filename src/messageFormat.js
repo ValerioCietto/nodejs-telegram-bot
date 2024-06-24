@@ -14,11 +14,14 @@ function messageNewEmergency(emergency) {
   });
   const vehiclesFromEmergency = vehiclesCodes.join(", ");
   const decodedCodex = decodeCode(emergency.codex);
-
+  let linkOpenstreetmap = "";
+  if (emergency.latitude) {
+    linkOpenstreetmap = `\nhttps://dumper.118er.it/mappa/sxvywkui/${emergency.longitude}/${emergency.latitude}`;
+  }
   emergencyString =
     `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} - ${emergency.codex} alle ${emergency.timeDelayed} IN CORSO ` +
     `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${vehiclesFromEmergency} ` +
-    `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency} \n link a openstreetmap `;
+    `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency}${linkOpenstreetmap} `;
   console.log("new emergency");
   return emergencyString;
 }
