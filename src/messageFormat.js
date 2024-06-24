@@ -16,7 +16,7 @@ function messageNewEmergency(emergency) {
   const decodedCodex = decodeCode(emergency.codex);
 
   emergencyString =
-    `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} alle ${emergency.timeDelayed} IN CORSO ` +
+    `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} - ${emergency.codex} alle ${emergency.timeDelayed} IN CORSO ` +
     `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${vehiclesFromEmergency} ` +
     `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency} \n link a openstreetmap `;
   console.log("new emergency");

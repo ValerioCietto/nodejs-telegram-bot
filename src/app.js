@@ -13,6 +13,7 @@ const {
 const DatabaseController = require("./sqlite3.controller.js");
 const dbController = new DatabaseController();
 dbController.createTables();
+dbController.clearEmergencies();
 const express = require("express");
 const cors = require("cors");
 

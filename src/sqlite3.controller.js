@@ -45,6 +45,16 @@ class DatabaseController {
     console.log("Tables created or already exist.");
   }
 
+  /**
+   * Clears all emergencies from the database by deleting all records in the "emergency" table.
+   *
+   * @return {void} This function does not return anything.
+   */
+  clearEmergencies() {
+    const stmt = this.db.prepare("DELETE FROM emergency");
+    stmt.run();
+  }
+
   addEmergency(
     emergencyId,
     vehicles,
