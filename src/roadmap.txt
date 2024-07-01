@@ -21,6 +21,9 @@ emergency change vehicle event
 emergency end event
 installer script
 
+https://dumper.118er.it/mappa/sxvywkui/11.316798258902928/44.49524776395553
+16.6479667509179
+
 https://www.openstreetmap.org/#map=16/44.5368/11.5327
 
 https://www.openstreetmap.org/#map=16/32.23339088586016/21.164510289911966

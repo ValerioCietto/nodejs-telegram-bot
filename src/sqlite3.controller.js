@@ -149,6 +149,12 @@ class DatabaseController {
     console.log("User deleted.");
   }
 
+  removeUser(chatId) {
+    const stmt = this.db.prepare("DELETE FROM user WHERE chatId = ?");
+    stmt.run(chatId);
+    console.log("User removed.");
+  }
+
   addSubscription(chatId, username, vehicleCode) {
     const stmt = this.db.prepare(
       "INSERT INTO subscription (chatId, username, vehicleCode) VALUES (?, ?, ?)"
