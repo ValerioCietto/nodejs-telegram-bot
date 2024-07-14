@@ -83,13 +83,10 @@ function textManager(ctx) {
     dbController.removeUser(ctx.chat.id);
     dbController.removeAllSubscriptionsByChatId(ctx.chat.id);
   } else if (ctx.message.text === "cancella iscrizioni") {
-    ctx.reply(
-      "Iscrizioni cancellate."
-    );
+    ctx.reply("Iscrizioni cancellate.");
     // remove the subscriber with the chat id
     dbController.removeAllSubscriptionsByChatId(ctx.chat.id);
-  }
-  else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
+  } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
     ctx.reply(
       "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
     );
@@ -218,17 +215,23 @@ async function handleEmergencyData(json) {
   onChangeVehiclesEmergencies(changeVehiclesEmergencies);
 
   // CHECK IF ENDED EMERGENCY
-  // const endedEmergencies = [];
-  // currentEmergencies.forEach((emergency) => {
-  //  if (!emergencyData.includes(emergency.emergencyId)) {
-  //    console.log(
-  //      "[handleEmergencyData] ended emergency: " + emergency.emergencyId
-  //    );
-  //    endedEmergencies.push(emergency.emergencyId);
-  //    dbController.deleteEmergency(emergency.emergencyId);
-  //  }
-  //});
-  //onEndedEmergencies(endedEmergencies);
+  const endedEmergencies = [];
+  currentEmergencies.forEach((emergency) => {
+    const isCurrentEmergency = dbController.getIfEmergencyExists(
+      emergency.emergencyId
+    );
+    if (isCurrentEmergency === undefined) {
+      console.log(
+        "[handleEmergencyData] EMERGENCY ENDED!!!!: " +
+          emergency.codex +
+          " " +
+          emergency.localityMunicipality
+      );
+      endedEmergencies.push(emergency.emergencyId);
+      dbController.deleteEmergency(emergency.emergencyId);
+    }
+  });
+  onEndedEmergencies(endedEmergencies);
 }
 
 // return true if the 2 emergencies have same manageVehicleForSynoptics
