@@ -82,12 +82,20 @@ function textManager(ctx) {
     // remove the subscriber with the chat id
     dbController.removeUser(ctx.chat.id);
     dbController.removeAllSubscriptionsByChatId(ctx.chat.id);
-  } else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
+  } else if (ctx.message.text === "cancella iscrizioni") {
+    ctx.reply(
+      "Iscrizioni cancellate."
+    );
+    // remove the subscriber with the chat id
+    dbController.removeAllSubscriptionsByChatId(ctx.chat.id);
+  }
+  else if (ctx.message.text === process.env.TELEGRAM_BOT_PASSWORD) {
     ctx.reply(
       "Password accettata, scrivi il mezzo a cui desideri sottoscrivere le notifiche TUTTO IN MAIUSCOLO. /stop per cancellare"
     );
     dbController.addUser(ctx.message.from.username, ctx.chat.id);
   } else if (vehicles.includes(ctx.message.text)) {
+    // add check to avoid multiple subscriptions for the same user - vehicle
     ctx.reply("mezzo sottoscritto: " + ctx.message.text);
     console.log(ctx.chat.id);
     console.log(ctx.message.from.username);

@@ -6,20 +6,21 @@ sqlite db controller
 parse emergency data to find vehicles
 emergency generator for test purposes
 message on new emergency
+Script Aggiorna.vbs
+userscript for greasymonkey firefox
 
 TODO
+testare evento end emergency con account reale
 generatore emergenze con db
 gestione sede
 gestione max users
 
 link openstreetmap -> da analizzare pagina
 
-new emergency event
-
 emergency code change event
 emergency change vehicle event
 emergency end event
-installer script
+
 
 https://dumper.118er.it/mappa/sxvywkui/11.316798258902928/44.49524776395553
 16.6479667509179
