@@ -242,24 +242,32 @@ function sameLogistics(emergency1, emergency2) {
   return true;
 }
 
+function sendMessageFormatted(chatId, text) {
+  try {
+    bot.telegram.sendMessage(chatId, text);
+  } catch (error) {
+    console.log("unable to send message to:", chatId);
+  }
+}
+
 function sendMessageNewEmergency(emergency, chatId) {
   const formattedText = messageNewEmergency(emergency);
-  bot.telegram.sendMessage(chatId, formattedText);
+  sendMessageFormatted(chatId, formattedText);
 }
 
 function sendMessageEndEmergency(emergency, chatId) {
   const formattedText = messageEndEmergency(emergency);
-  bot.telegram.sendMessage(chatId, formattedText);
+  sendMessageFormatted(chatId, formattedText);
 }
 
 function sendMessageChangeCode(emergency, chatId) {
   const formattedText = messageChangeCode(emergency);
-  bot.telegram.sendMessage(chatId, formattedText);
+  sendMessageFormatted(chatId, formattedText);
 }
 
 function sendMessageChangeNumberOfVehicles(emergency, chatId) {
   const formattedText = messageChangeNumberOfVehicles(emergency);
-  bot.telegram.sendMessage(chatId, formattedText);
+  sendMessageFormatted(chatId, formattedText);
 }
 
 function onEndedEmergencies(emergencies) {

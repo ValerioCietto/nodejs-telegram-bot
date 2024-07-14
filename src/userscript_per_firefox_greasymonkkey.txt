@@ -4,11 +4,12 @@
 // @grant    none
 // @author   Monterenzio
 // @match    https://dumper.118er.it/prov/sxvywkui
+// @require	 https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
 (function () {
   "use strict";
-  console.log("hello world!");
+  console.log("Script per download emergenze verso nodejs-telegram-bot attivo!");
   $.getJSON("https://dumper.118er.it/downloadJSON/1", function (data) {
     console.log(JSON.stringify(data));
     // send data with stringified json
