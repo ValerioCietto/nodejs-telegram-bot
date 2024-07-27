@@ -10,4 +10,3 @@ dbController.addUser("user1", "test");
 
 const subscribers = dbController.getSubscribers("MONTERENZIO41");
 console.log(subscribers);
-// dbController.deleteUser(1);

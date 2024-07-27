@@ -24,7 +24,12 @@ let previousEmergencies = [];
 let emergencies = [];
 const subscribers = [];
 
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+let bot = {};
+try {
+  bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+} catch (error) {
+  console.log("error in starting bot", error);
+}
 
 console.log("config bot");
 bot.launch();
