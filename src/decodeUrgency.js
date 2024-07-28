@@ -27,7 +27,7 @@ const pathologies = {
   C15: "Infettiva",
   C19: "Altra Patologia",
   C20: "Patologia non identificata",
-  "IU*": "Non definito",
+  "IU*": "Trasferimento intra-ospedaliero",
 };
 
 const urgencies = {

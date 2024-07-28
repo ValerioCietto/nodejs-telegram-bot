@@ -21,7 +21,7 @@ function messageNewEmergency(emergency) {
   emergencyString =
     `🚑ALERT! EMERGENZA N° ${emergency.emergencyId} - ${emergency.codex} alle ${emergency.timeDelayed} IN CORSO ` +
     `\n ${emergency.localityMunicipality} ${emergency.address} \n Il mezzo assegnato all'intervento è la macchina ${vehiclesFromEmergency} ` +
-    `in ${decodedCodex.place} con patologia ${decodedCodex.patology} codice ${decodedCodex.urgency}${linkOpenstreetmap} `;
+    `in ${decodedCodex.place} con patologia ${decodedCodex.pathology} codice ${decodedCodex.urgency}${linkOpenstreetmap} `;
   console.log("new emergency");
   return emergencyString;
 }

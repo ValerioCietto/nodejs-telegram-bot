@@ -10,6 +10,8 @@ const {
   messageChangeNumberOfVehicles,
   messageEmergencyInStandBy,
 } = require("./messageFormat.js");
+const fs = require("fs");
+const path = require("path");
 const DatabaseController = require("./sqlite3.controller.js");
 const dbController = new DatabaseController();
 dbController.createTables();
@@ -62,10 +64,20 @@ let dateTimeStart = new Date();
 let dateTimeLastData = new Date();
 
 app.post("/data", (req, res) => {
-  console.log(req.body.dati);
   // parse json that was stringified
   const data = JSON.parse(req.body.dati);
+
+  // write data req.body.dati to file data/testRecord/{timestamp}.json
+  // this.dateTimeLastData = new Date();
+  // const testRecordDir = path.join(__dirname, "../data/testRecord");
+  // const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  // const filename = path.join(testRecordDir, `${timestamp}.json`);
+  // fs.writeFileSync(filename, JSON.stringify(data, null, 2), "utf-8");
+  // console.log(`Data written to ${filename}`);
+  // end write data
+
   dateTimeLastData = new Date();
+  console.log("dateTimeLastData", dateTimeLastData);
   handleEmergencyData(data);
   res.send("ok");
 });
@@ -108,6 +120,7 @@ function textManager(ctx) {
     );
   } else {
     ctx.reply("Comando non riconosciuto");
+    console.log(ctx.update);
   }
 }
 
