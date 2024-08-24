@@ -1,5 +1,5 @@
 // launch with node src/app.js
-// release date 24-08-2024
+// release date 24-08-2024 10:58
 
 const { Telegraf } = require("telegraf");
 const { decodeCode } = require("./decodeUrgency");
@@ -35,7 +35,12 @@ try {
 }
 
 console.log("config bot");
-bot.launch();
+try {
+  bot.launch();
+} catch (error) {
+  console.log("error in launching bot", error);
+}
+
 bot.on("message", (ctx) => textManager(ctx));
 // Enable graceful stop
 process.once("SIGINT", () => onStop("SIGINT"));
