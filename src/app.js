@@ -390,7 +390,18 @@ function onNewEmergencies(emergencies) {
               "] subscriber: " +
               subscriber.username
           );
-          sendMessageNewEmergency(emergency, subscriber.chatId);
+          try {
+            sendMessageNewEmergency(emergency, subscriber.chatId);
+          } catch (error) {
+            console.log(
+              "[onNewEmergencies][" +
+                emergency.emergencyId +
+                "] [chatId:" +
+                subscriber.chatId +
+                "] Send exception from telegram"
+            );
+            console.error(error);
+          }
         });
       });
     }
