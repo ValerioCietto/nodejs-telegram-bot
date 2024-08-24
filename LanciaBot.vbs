@@ -10,7 +10,7 @@ scriptPath = objFSO.GetParentFolderName(WScript.ScriptFullName)
 objShell.CurrentDirectory = scriptPath
 
 ' Show message box for 2 seconds
-objShell.Popup "il bot è in avvio", 2, "Avvio Bot", vbInformation
+objShell.Popup "Avvio il bot", 2, "Avvio Bot", vbInformation
 
 ' Run the Node.js application with CMD window visible
 objShell.Run "cmd.exe /k node src/app.js", 1, False
