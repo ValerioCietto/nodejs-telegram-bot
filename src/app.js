@@ -279,6 +279,7 @@ function sameLogistics(emergency1, emergency2) {
 
 function sendMessageFormatted(chatId, text) {
   try {
+    console.log("sending message to:", chatId, text);
     bot.telegram.sendMessage(chatId, text);
   } catch (error) {
     console.log("unable to send message to:", chatId);
@@ -393,7 +394,7 @@ function onNewEmergencies(emergencies) {
             "[onNewEmergencies][" +
               emergency.emergencyId +
               "] subscriber: " +
-              subscriber.username
+              subscriber.chatId
           );
           try {
             sendMessageNewEmergency(emergency, subscriber.chatId);
