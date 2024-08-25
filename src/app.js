@@ -34,6 +34,12 @@ try {
   console.log("error in starting bot", error);
 }
 
+process.on("uncaughtException", (error) => {
+  console.error("Unhandled Exception:", error);
+  // Optionally log the error or perform other recovery actions
+  // Prevent the application from exiting
+});
+
 console.log("config bot");
 try {
   bot.launch();
@@ -278,8 +284,8 @@ function sameLogistics(emergency1, emergency2) {
 }
 
 function sendMessageFormatted(chatId, text) {
+  console.log("sending message to:", chatId, text);
   try {
-    console.log("sending message to:", chatId, text);
     bot.telegram.sendMessage(chatId, text);
   } catch (error) {
     console.log("unable to send message to:", chatId);
