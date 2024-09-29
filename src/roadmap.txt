@@ -10,6 +10,7 @@ Script Aggiorna.vbs
 userscript for greasymonkey firefox
 
 TODO
+pagina gestione sottoscrizioni
 testare evento end emergency con account reale
 generatore emergenze con db
 gestione sede

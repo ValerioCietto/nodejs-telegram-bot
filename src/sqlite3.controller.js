@@ -192,6 +192,21 @@ class DatabaseController {
     console.log("Subscriptions for chatId " + chatId + " removed");
   }
 
+  /**
+   * Retrieve all subscriptions from the database.
+   * @return {Array.<Object>} an array of objects containing chatId, username, and vehicleCode.
+   */
+  getAllSubscriptions() {
+    const stmt = this.db.prepare("SELECT * FROM subscription");
+    return stmt.all();
+  }
+
+  removeSubscription(chatId) {
+    const stmt = this.db.prepare("DELETE FROM subscription WHERE chatId = ?");
+    stmt.run(chatId);
+    console.log("Subscription removed.");
+  }
+
   close() {
     this.db.close();
   }
