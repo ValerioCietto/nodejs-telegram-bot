@@ -87,12 +87,15 @@ app.delete("/subscriptions", async (req, res) => {
   if (!chatId || !vehicleCode) {
     return res.status(400).send("Missing chatId or vehicleCode.");
   }
+  console.log(
+    "deleting subscription for chatId: " +
+      chatId +
+      " and vehicleCode: " +
+      vehicleCode
+  );
 
   try {
-    await dbController.removeSubscriptionByChatIDandVehicleCode(
-      chatId,
-      vehicleCode
-    );
+    await dbController.removeSubscriber(chatId, vehicleCode);
     res.status(200).send("Subscription deleted successfully.");
   } catch (error) {
     console.error("Error deleting subscription:", error);
