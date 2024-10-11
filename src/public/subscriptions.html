@@ -35,8 +35,8 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          // Remove the row from the table
-          document.getElementById('row-' + chatId + '-' + vehicleCode).remove();
+          // Reload the page after successfully removing the subscription
+          window.location.reload();
         } else {
           alert('Failed to remove subscription');
         }
@@ -45,6 +45,7 @@
         console.error('Error:', error);
       });
     }
+
 
     // Fetch subscriptions and populate the table
     function loadSubscriptions() {

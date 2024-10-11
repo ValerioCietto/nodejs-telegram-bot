@@ -1,4 +1,5 @@
-const dbController = require("./sqlite3.controller");
+const DatabaseController = require("./sqlite3.controller.js");
+const dbController = new DatabaseController();
 const { vehicles } = require("../configurazione/Veicoli");
 
 function handleTextCommand(ctx, bot) {

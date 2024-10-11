@@ -207,6 +207,14 @@ class DatabaseController {
     console.log("Subscription removed.");
   }
 
+  removeSubscriptionByChatIDandVehicleCode(chatId, vehicleCode) {
+    const stmt = this.db.prepare(
+      "DELETE FROM subscription WHERE chatId = ? AND vehicleCode = ?"
+    );
+    stmt.run(chatId);
+    console.log("Subscription removed.");
+  }
+
   close() {
     this.db.close();
   }
