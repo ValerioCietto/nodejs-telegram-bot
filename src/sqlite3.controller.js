@@ -51,6 +51,7 @@ class DatabaseController {
    * @return {void} This function does not return anything.
    */
   clearEmergencies() {
+    console.log("[sqlite3.controller.js] clearEmergencies()");
     const stmt = this.db.prepare("DELETE FROM emergency");
     stmt.run();
   }
