@@ -27,7 +27,7 @@ let bot = {};
 try {
   bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 } catch (error) {
-  console.log("error in starting bot", error);
+  console.log("[app.js] error in starting bot", error);
 }
 
 process.on("uncaughtException", (error) => {
@@ -120,12 +120,12 @@ app.post("/data", (req, res) => {
   // end write data
 
   dateTimeLastData = new Date();
-  console.log("dateTimeLastData", dateTimeLastData);
+  console.log("[app.js][/data] dateTimeLastData", dateTimeLastData);
   handleEmergencyData(data);
   res.send("ok");
 });
 app.listen(13000, () => {
-  console.log("Server started on port 13000");
+  console.log("[app.js] Server started on port 13000");
 });
 dateTimeStart = new Date();
 
@@ -207,7 +207,7 @@ async function handleEmergencyData(json) {
   currentEmergencies.forEach((current) => {
     currentEmergenciesIds.push("" + current.emergencyId);
   });
-  console.log(currentEmergenciesIds);
+  console.log("[handleEmergencyData] ", currentEmergenciesIds);
   // CHECK IF NEW EMERGENCY
   emergencyData.forEach((emergency) => {
     const isNewEmergency = dbController.addEmergency(
