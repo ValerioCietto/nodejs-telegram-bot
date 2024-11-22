@@ -10,7 +10,7 @@ const path = require("path");
 
 class DatabaseController {
   constructor() {
-    this.db = new Database(path.resolve(__dirname, "../db/118er.db"));
+    this.db = new Database(path.resolve(__dirname, "../db/118er_v2.db"));
     console.log("Connected to the 118er database.");
   }
 

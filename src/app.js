@@ -1,5 +1,5 @@
 // launch with node src/app.js
-// release date 24-08-2024 10:58
+// release date 15-08-2024 10:58
 
 const { Telegraf } = require("telegraf");
 const { decodeCode } = require("./decodeUrgency.js");
