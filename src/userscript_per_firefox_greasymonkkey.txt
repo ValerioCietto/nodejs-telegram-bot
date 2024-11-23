@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name     Dumper
+// @name     DumperForNodeJsBot
 // @version  1
 // @grant    none
 // @author   Monterenzio
@@ -7,20 +7,46 @@
 // @require	 https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
 // ==/UserScript==
 
+function parseTableToJSON() {
+  // Select all table rows within the tbody
+  const rows = document.querySelectorAll('#lista-codici tr');
+  
+  const emergencies = Array.from(rows).map(row => {
+    // Extract cell values
+    const cells = row.querySelectorAll('td');
+    const codex = cells[0]?.textContent.trim(); // Codice
+    const prov = cells[1]?.textContent.trim(); // Provincia (optional, not in JSON target)
+    const localityMunicipality = cells[2]?.textContent.trim(); // Località - Comune
+    const address = cells[3]?.textContent.trim(); // Indirizzo
+    const emergencyId = cells[4]?.textContent.trim(); // Evento
+    const manageVehicleForSynoptics = cells[5]?.textContent.trim(); // Mezzo
+    const mapLink = cells[7]?.querySelector('a')?.href; // Map link
+
+    // Build JSON object for this row
+    return {
+      codex,
+      localityMunicipality,
+      address,
+      timeDelayed: Date.now(),
+      emergencyId,
+      manageVehicleForSynoptics: manageVehicleForSynoptics ? manageVehicleForSynoptics.split(',').map(m => m.trim()) : [],
+      eventCoord: mapLink
+    };
+  });
+
+  return emergencies;
+}
+
 (function () {
   "use strict";
   console.log("Script per download emergenze verso nodejs-telegram-bot attivo!");
-  $.getJSON("https://dumper.118er.it/downloadJSON/1", function (data) {
-    console.log(JSON.stringify(data));
-    // send data with stringified json
-    // send with timestamp to avoid caching
-    const urlString = "http://localhost:13000/data?timestamp="+Date.now();
-    // $.post("http://localhost:13000/data", { dati: JSON.stringify(data) });
+
+  const dati = parseTableToJSON();
     $.ajax({
-      url: urlString,
+      url: "http://localhost:13000/data",
       type: "POST",
       contentType: "application/json", // This line is crucial!
-      data: JSON.stringify({ dati: JSON.stringify(data) }),
+      data: JSON.stringify(dati),
       success: function (response) {
         console.log("Server response:", response);
       },
@@ -28,5 +54,6 @@
         console.error("Error:", error);
       },
     });
-  });
+
 })();
+
