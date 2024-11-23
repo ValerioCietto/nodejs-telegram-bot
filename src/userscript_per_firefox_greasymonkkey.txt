@@ -13,9 +13,11 @@
   $.getJSON("https://dumper.118er.it/downloadJSON/1", function (data) {
     console.log(JSON.stringify(data));
     // send data with stringified json
+    // send with timestamp to avoid caching
+    const urlString = "http://localhost:13000/data?timestamp="+Date.now();
     // $.post("http://localhost:13000/data", { dati: JSON.stringify(data) });
     $.ajax({
-      url: "http://localhost:13000/data",
+      url: urlString,
       type: "POST",
       contentType: "application/json", // This line is crucial!
       data: JSON.stringify({ dati: JSON.stringify(data) }),
