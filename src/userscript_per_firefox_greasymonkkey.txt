@@ -4,23 +4,31 @@
 // @grant    none
 // @author   Monterenzio
 // @match    https://dumper.118er.it/prov/sxvywkui
-// @require	 https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js 
+// @require	 https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // ==/UserScript==
 
 function parseTableToJSON() {
   // Select all table rows within the tbody
-  const rows = document.querySelectorAll('#lista-codici tr');
-  
-  const emergencies = Array.from(rows).map(row => {
+  const rows = document.querySelectorAll("#lista-codici tr");
+
+  const emergencies = Array.from(rows).map((row) => {
     // Extract cell values
-    const cells = row.querySelectorAll('td');
+    const cells = row.querySelectorAll("td");
     const codex = cells[0]?.textContent.trim(); // Codice
-    const prov = cells[1]?.textContent.trim(); // Provincia (optional, not in JSON target)
     const localityMunicipality = cells[2]?.textContent.trim(); // Località - Comune
     const address = cells[3]?.textContent.trim(); // Indirizzo
     const emergencyId = cells[4]?.textContent.trim(); // Evento
-    const manageVehicleForSynoptics = cells[5]?.textContent.trim(); // Mezzo
-    const mapLink = cells[7]?.querySelector('a')?.href; // Map link
+    const vehicleCodes = cells[5]?.textContent.trim(); // Mezzo
+    const mapLink = cells[7]?.querySelector("a")?.href; // Map link
+    // wrap every vehiclecode in an array of objects
+    vehicleCodeArray = vehicleCodes
+      .split(",")
+      .map((m) => m.trim())
+      .map((vehicleCode) => {
+        return {
+          vehicleCode,
+        };
+      });
 
     // Build JSON object for this row
     return {
@@ -29,8 +37,8 @@ function parseTableToJSON() {
       address,
       timeDelayed: Date.now(),
       emergencyId,
-      manageVehicleForSynoptics: manageVehicleForSynoptics ? manageVehicleForSynoptics.split(',').map(m => m.trim()) : [],
-      eventCoord: mapLink
+      manageVehicleForSynoptics: vehicleCodeArray,
+      eventCoord: mapLink,
     };
   });
 
@@ -39,21 +47,21 @@ function parseTableToJSON() {
 
 (function () {
   "use strict";
-  console.log("Script per download emergenze verso nodejs-telegram-bot attivo!");
+  console.log(
+    "Script per download emergenze verso nodejs-telegram-bot attivo!"
+  );
 
   const dati = parseTableToJSON();
-    $.ajax({
-      url: "http://localhost:13000/data",
-      type: "POST",
-      contentType: "application/json", // This line is crucial!
-      data: JSON.stringify(dati),
-      success: function (response) {
-        console.log("Server response:", response);
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-      },
-    });
-
+  $.ajax({
+    url: "http://localhost:13000/data",
+    type: "POST",
+    contentType: "application/json", // This line is crucial!
+    data: JSON.stringify(dati),
+    success: function (response) {
+      console.log("Server response:", response);
+    },
+    error: function (xhr, status, error) {
+      console.error("Error:", error);
+    },
+  });
 })();
-
