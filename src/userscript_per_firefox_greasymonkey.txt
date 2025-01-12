@@ -4,8 +4,13 @@
 // @grant    none
 // @author   Monterenzio
 // @match    https://dumper.118er.it/prov/sxvywkui
-// @require	 https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
+// @require  https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // ==/UserScript==
+
+function sanitize(value) {
+  // If the value is undefined, null, or empty, return an empty string
+  return value ?? "";
+}
 
 function parseTableToJSON() {
   // Select all table rows within the tbody
@@ -14,21 +19,20 @@ function parseTableToJSON() {
   const emergencies = Array.from(rows).map((row) => {
     // Extract cell values
     const cells = row.querySelectorAll("td");
-    const codex = cells[0]?.textContent.trim(); // Codice
-    const localityMunicipality = cells[2]?.textContent.trim(); // Località - Comune
-    const address = cells[3]?.textContent.trim(); // Indirizzo
-    const emergencyId = cells[4]?.textContent.trim(); // Evento
-    const vehicleCodes = cells[5]?.textContent.trim(); // Mezzo
-    const mapLink = cells[7]?.querySelector("a")?.href; // Map link
-    // wrap every vehiclecode in an array of objects
-    vehicleCodeArray = vehicleCodes
-      .split(",")
-      .map((m) => m.trim())
-      .map((vehicleCode) => {
-        return {
-          vehicleCode,
-        };
-      });
+    const codex = sanitize(cells[0]?.textContent?.trim()); // Codice
+    const localityMunicipality = sanitize(cells[2]?.textContent?.trim()); // Località - Comune
+    const address = sanitize(cells[3]?.textContent?.trim()); // Indirizzo
+    const emergencyId = sanitize(cells[4]?.textContent?.trim()); // Evento
+    const vehicleCodes = sanitize(cells[5]?.textContent?.trim()); // Mezzo
+    const mapLink = sanitize(cells[7]?.querySelector("a")?.href); // Map link
+
+    // Wrap every vehicle code in an array of objects
+    const vehicleCodeArray = vehicleCodes
+      ? vehicleCodes
+          .split(",")
+          .map((m) => sanitize(m.trim()))
+          .map((vehicleCode) => ({ vehicleCode }))
+      : [];
 
     // Build JSON object for this row
     return {
@@ -52,11 +56,12 @@ function parseTableToJSON() {
   );
 
   const dati = parseTableToJSON();
+  console.log(JSON.stringify({ dati:dati }))
   $.ajax({
     url: "http://localhost:13000/data",
     type: "POST",
     contentType: "application/json", // This line is crucial!
-    data: JSON.stringify(dati),
+    data:{ JSON.stringify({ dati:dati }) },
     success: function (response) {
       console.log("Server response:", response);
     },

@@ -123,7 +123,7 @@ app.post("/data", (req, res) => {
   } catch (error) {
     console.log("unable to parse data", error);
     res.status(400).send("unable to parse data");
-    console.log(req.body.data);
+    console.log(req.body.dati);
     return;
   }
 
