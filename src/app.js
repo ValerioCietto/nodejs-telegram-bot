@@ -118,7 +118,14 @@ let dateTimeLastData = new Date();
 
 app.post("/data", (req, res) => {
   // parse json that was stringified
-  const data = JSON.parse(req.body.dati);
+  try {
+    const data = JSON.parse(req.body.dati);
+  } catch (error) {
+    console.log("unable to parse data", error);
+    res.status(400).send("unable to parse data");
+    console.log(req.body.data);
+    return;
+  }
 
   // write data req.body.dati to file data/testRecord/{timestamp}.json
   // this.dateTimeLastData = new Date();
