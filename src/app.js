@@ -55,7 +55,7 @@ function onStop(signal) {
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true })); // Explicitly set the extended option
 app.use(cors());
 app.use((req, res, next) => {
   res.setHeader(
@@ -119,27 +119,28 @@ let dateTimeLastData = new Date();
 app.post("/data", (req, res) => {
   // parse json that was stringified
   try {
-    const data = JSON.parse(req.body.dati);
+    console.log(req.body);
+    const data = req.body.dati;
+
+    // write data req.body.dati to file data/testRecord/{timestamp}.json
+    // this.dateTimeLastData = new Date();
+    // const testRecordDir = path.join(__dirname, "../data/testRecord");
+    // const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    // const filename = path.join(testRecordDir, `${timestamp}.json`);
+    // fs.writeFileSync(filename, JSON.stringify(data, null, 2), "utf-8");
+    // console.log(`Data written to ${filename}`);
+    // end write data
+
+    dateTimeLastData = new Date();
+    console.log("[app.js][/data] dateTimeLastData", dateTimeLastData);
+    handleEmergencyData(data);
+    res.send("ok");
   } catch (error) {
     console.log("unable to parse data", error);
     res.status(400).send("unable to parse data");
     console.log(req.body.dati);
     return;
   }
-
-  // write data req.body.dati to file data/testRecord/{timestamp}.json
-  // this.dateTimeLastData = new Date();
-  // const testRecordDir = path.join(__dirname, "../data/testRecord");
-  // const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  // const filename = path.join(testRecordDir, `${timestamp}.json`);
-  // fs.writeFileSync(filename, JSON.stringify(data, null, 2), "utf-8");
-  // console.log(`Data written to ${filename}`);
-  // end write data
-
-  dateTimeLastData = new Date();
-  console.log("[app.js][/data] dateTimeLastData", dateTimeLastData);
-  handleEmergencyData(data);
-  res.send("ok");
 });
 app.listen(13000, () => {
   console.log("[app.js] Server started on port 13000");

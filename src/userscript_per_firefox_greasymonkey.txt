@@ -61,7 +61,7 @@ function parseTableToJSON() {
     url: "http://localhost:13000/data",
     type: "POST",
     contentType: "application/json", // This line is crucial!
-    data:{ JSON.stringify({ dati:dati }) },
+    data: JSON.stringify({ dati:dati }),
     success: function (response) {
       console.log("Server response:", response);
     },
